@@ -2,22 +2,48 @@ import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
 import { useState } from "react";
+import { nanoid } from "nanoid";
 
-export default function App(props) {
-// this will preserve the initial value of props in the 'tasks' variable
+export default function App(props) {  
+// this will preserve the initial value of props in the 'tasks' variable using the 
+// useState() 'hook' to return an array - 'tasks' - which 
 const [tasks, setTasks] = useState(props.tasks);
+
+function toggleTaskCompleted(id) {
+  const updatedTasks = tasks.map((task) => {
+    // if this task has the same id as the edited task
+    if (id === task.id) {
+      // use object spread to make a new object whose 'completed' prop is inverted
+      return {...task, completed: !task.completed};
+    }
+    return task;
+  });
+  setTasks(updatedTasks);
+}
+
+function deleteTask(id) {
+  const remainingTasks = tasks.filter((task) => id !== task.id);
+  setTasks(remainingTasks);
+}
+
 // this passes the relevant properties from 'tasks' into the Todo component as props
   const taskList = tasks?.map((task) => (
     <Todo 
       id={task.id} 
       name={task.name} 
       completed={task.completed}
-      key={task.id} 
+      key={task.id}
+      toggleTaskCompleted={toggleTaskCompleted}
+      deleteTask={deleteTask}
     />
   ));
 
   function addTask(name) {
-    alert(name);
+    // nanoid is a JS library designed to create unique identifiers
+    const newTask = { id: `todo-${nanoid()}`, name, completed: false };
+    // this uses the spread syntax to copy the information from the array
+    // 'tasks' and add it to the object 'newTask' so th
+    setTasks([...tasks, newTask])
   }
 
   return (
