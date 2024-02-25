@@ -25,6 +25,17 @@ function deleteTask(id) {
   setTasks(remainingTasks);
 }
 
+function editTask(id, newName) {
+  const editTaskList = tasks.map((task) => {
+    if (id === task.id) {
+      // copy the task and update the name key with the newName argument
+      return {...task, name: newName};
+    }
+    return task;
+  });
+  setTasks(editTaskList);
+}
+
 // this passes the relevant properties from 'tasks' into the Todo component as props
   const taskList = tasks?.map((task) => (
     <Todo 
@@ -34,6 +45,7 @@ function deleteTask(id) {
       key={task.id}
       toggleTaskCompleted={toggleTaskCompleted}
       deleteTask={deleteTask}
+      editTask={editTask}
     />
   ));
 
