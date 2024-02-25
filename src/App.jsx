@@ -4,10 +4,22 @@ import FilterButton from "./components/FilterButton";
 import { useState } from "react";
 import { nanoid } from "nanoid";
 
+// the properties for each key in this object are functions which will be used
+// to filter the 'tasks' (being passed from main.jsx through 'props') data array
+const FILTER_MAP = {
+  All : () => true,
+  Active: (task) => !task.completed,
+  Completed: (task) => task.completed,
+};
+
+// will return an array of the 'key' names from FILTER_MAP
+const FILTER_NAMES = Object.keys(FILTER_MAP);
+
 export default function App(props) {  
 // this will preserve the initial value of props in the 'tasks' variable using the 
 // useState() 'hook' to return an array - 'tasks' - which 
 const [tasks, setTasks] = useState(props.tasks);
+const [filter, setFilter] = useState('All');
 
 function toggleTaskCompleted(id) {
   const updatedTasks = tasks.map((task) => {
@@ -49,6 +61,15 @@ function editTask(id, newName) {
     />
   ));
 
+  const filterList = FILTER_NAMES.map((name) => (
+    <FilterButton 
+      key={name} 
+      name={name} 
+      isPressed={name === filter} 
+      setFilter={setFilter} 
+    />
+  ));
+  
   function addTask(name) {
     // nanoid is a JS library designed to create unique identifiers
     const newTask = { id: `todo-${nanoid()}`, name, completed: false };
@@ -66,9 +87,7 @@ function editTask(id, newName) {
       <Form addTask={addTask}/>
 
       <div className="filters btn-group stack-exception">
-        <FilterButton />
-        <FilterButton />
-        <FilterButton />
+        {filterList}
       </div>
       <h2 id="list-heading">3 tasks remaining</h2>
       <ul
