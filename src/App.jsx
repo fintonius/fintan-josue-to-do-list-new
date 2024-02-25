@@ -32,6 +32,7 @@ function toggleTaskCompleted(id) {
   });
   setTasks(updatedTasks);
 }
+
 function deleteTask(id) {
   const remainingTasks = tasks.filter((task) => id !== task.id);
   setTasks(remainingTasks);
@@ -49,7 +50,10 @@ function editTask(id, newName) {
 }
 
 // this passes the relevant properties from 'tasks' into the Todo component as props
-  const taskList = tasks?.map((task) => (
+// and filters by the 'filter' variable
+  const taskList = tasks
+  .filter(FILTER_MAP[filter])
+  .map((task) => (
     <Todo 
       id={task.id} 
       name={task.name} 
@@ -89,7 +93,7 @@ function editTask(id, newName) {
       <div className="filters btn-group stack-exception">
         {filterList}
       </div>
-      <h2 id="list-heading">3 tasks remaining</h2>
+      <h2 id="list-heading"> {taskList.length} tasks remaining</h2>
       <ul
         role="list"
         className="todo-list stack-large stack-exception"
