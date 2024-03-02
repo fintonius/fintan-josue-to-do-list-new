@@ -1,8 +1,27 @@
 import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { nanoid } from "nanoid";
+
+// STEPS TO COMPLETE:
+// connect to local storage - COMPLETED
+// pull data from local storage
+// add data to local storage
+
+// Josue's approach is to put the DATA object here so it's not being imported as a prop
+// from main.jsx. This works but I want to figure out how to make it work on my own! It's
+// good to get used to solving problems as it helps me more than anything understand how
+// stuff works - in this case using local storage but probably more importantly, writing to
+// and reading from an external source.
+// SO:
+// use DATA as the template to create the file structure that is stored in local data
+// BUT the actual data that gets added to the ToDo list shown to the user should be coming 
+// local storage
+
+function connectLocalStorage(task) {
+  localStorage.setItem("task", JSON.stringify(task));
+}
 
 // the properties for each key in this object are functions which will be used
 // to filter the 'tasks' (being passed from main.jsx through 'props') data array
@@ -20,6 +39,14 @@ export default function App(props) {
 // useState() 'hook' to return an array - 'tasks' - which 
 const [tasks, setTasks] = useState(props.tasks);
 const [filter, setFilter] = useState('All');
+
+// the [tasks] array being passed as an argument is a list of values useEffect will
+// depend on. It will only run when one of these values changes.
+useEffect(() => {
+  if (tasks) {
+    connectLocalStorage(tasks)
+  }
+}, [tasks]);
 
 function toggleTaskCompleted(id) {
   const updatedTasks = tasks.map((task) => {
