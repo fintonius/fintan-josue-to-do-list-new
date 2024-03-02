@@ -17,10 +17,23 @@ import { nanoid } from "nanoid";
 // SO:
 // use DATA as the template to create the file structure that is stored in local data
 // BUT the actual data that gets added to the ToDo list shown to the user should be coming 
-// local storage
+// from local storage
+// this means that when the page reloads or refreshes whatever function is triggered to 
+// update the ToDo list should be pulling the DATA from local storage - currently it's coming
+// from the props being sent by main.jsx
+
+// on page load check to see if there is anything stored in local data called 'task'
+// if yes: put this into a variable and render it on the screen
+// if no: do nothing
+
 
 function connectLocalStorage(task) {
   localStorage.setItem("task", JSON.stringify(task));
+}
+
+function retrieveLocalStorage() {
+  let test = localStorage.getItem('task')
+  console.log(test);
 }
 
 // the properties for each key in this object are functions which will be used
@@ -37,16 +50,35 @@ const FILTER_NAMES = Object.keys(FILTER_MAP);
 export default function App(props) {  
 // this will preserve the initial value of props in the 'tasks' variable using the 
 // useState() 'hook' to return an array - 'tasks' - which 
-const [tasks, setTasks] = useState(props.tasks);
+const [tasks, setTasks] = useState([]);
 const [filter, setFilter] = useState('All');
 
 // the [tasks] array being passed as an argument is a list of values useEffect will
 // depend on. It will only run when one of these values changes.
+// useEffect(() => {
+//   if (tasks) {
+//     connectLocalStorage(tasks)
+//   }
+// }, [tasks]);
+
 useEffect(() => {
-  if (tasks) {
-    connectLocalStorage(tasks)
+
+  const onPageLoad = () => {
+    if (localStorage.getItem('task')) {
+      tasks.push(localStorage.getItem('task'));
+      console.log('this tasks shite worked!', tasks)
+    } else {
+      console.log('faaaaaaail loser')
+    }
+  };
+
+  if (document.readyState === 'complete') {    
+    console.log('this is first if:', onPageLoad());
+  } else {
+    window.addEventListener('load', onPageLoad, false);
+    // return () => window.removeEventListener('load', onPageLoad);
   }
-}, [tasks]);
+}, []);
 
 function toggleTaskCompleted(id) {
   const updatedTasks = tasks.map((task) => {
@@ -68,16 +100,19 @@ function deleteTask(id) {
 function editTask(id, newName) {
   const editTaskList = tasks.map((task) => {
     if (id === task.id) {
+      
       // copy the task and update the name key with the newName argument
       return {...task, name: newName};
     }
     return task;
   });
+  retrieveLocalStorage();
   setTasks(editTaskList);
 }
 
 // this passes the relevant properties from 'tasks' into the Todo component as props
-// and filters by the 'filter' variable
+// and filters by the 'filter' variable which is determined by whatever button is pressed
+// by the user
   const taskList = tasks
   .filter(FILTER_MAP[filter])
   .map((task) => (
@@ -130,3 +165,9 @@ function editTask(id, newName) {
     </div>
   );
 }
+
+
+// so... what I was thinking was you don't need to import the DATA object or have one stored
+// here either - it's probably possible to just use the localstorage data. Though thinking more
+// about it would probably be quite difficult so maybe just stick to figuring it out with 
+// the current setup...
